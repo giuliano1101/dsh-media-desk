@@ -28,6 +28,8 @@ For platform discovery, inspect `media_desk_status.supportedPlatforms` and `medi
 
 The task must explicitly target the desktop machine running the workbench. Keep DeepSeek Harness running. Local CLI calls reach the existing private Unix socket; they require no public HTTP endpoint, tunnel, or model API key. Inspect Settings → Computer → Your computer → Execution on this computer to understand the current approval policy; do not silently broaden it.
 
+The shared CLI entry stays the same after an upgrade. Check the live version with `media-desk doctor` before using the new `lab` commands; a local `tools` listing alone does not prove Host compatibility. For an MCP client running on the workbench machine, use the bundled [desktop-profile configuration](media-desk.mcp.json), replace `command` with the installed launcher's absolute path if needed, and reconnect after upgrading the Host and CLI together. Do not paste a Mac-local executable path into a cloud command connector. See the [Chinese configuration and verification steps](multi-account-workspaces.md#配置与升级核验).
+
 The CLI and official MCP transports are covered by the project tests. Configure the executable path for your installation and verify the actual Bot-to-workbench connection before relying on it. See [official local execution controls](https://docs.x.ai/grok-bot/approvals-security-and-privacy#control-access-to-your-local-computer).
 
 ## Alternative: cloud MCP connector

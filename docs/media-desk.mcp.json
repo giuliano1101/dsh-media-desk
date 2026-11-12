@@ -3,7 +3,7 @@
     "media-desk": {
       "type": "stdio",
       "command": "media-desk",
-      "args": ["mcp"]
+      "args": ["--profile", "desktop", "mcp"]
     }
   }
 }

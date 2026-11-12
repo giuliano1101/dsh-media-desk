@@ -22,6 +22,10 @@ media-desk export ITEM_ID
 
 The package exposes `bin/media-desk.js`. Run it with Node 20+ or the installed Harness's bundled Node runtime. A launcher on your PATH can expose it as `media-desk`; use its absolute path in clients that do not inherit PATH. The launcher should resolve the installed package, set its runtime's Node mode when needed, and forward arguments without printing banners. Update the example MCP configuration's command to match your installation.
 
+The [MCP configuration](media-desk.mcp.json) selects the `desktop` profile explicitly and contains no credentials or machine-specific home directory. For a different data home or profile, set `--home` and `--profile` to match the running Host. If the desktop app was renamed or moved, update a custom launcher's runtime executable path while continuing to load the installed plugin; do not point a newer client at an older Host to advertise unsupported tools.
+
+After installing the same package version for the Host and CLI, run `media-desk doctor` to check the live `pluginVersion`, then reconnect existing stdio MCP clients so their processes reload the tool catalog. Version `.5` exposes 20 tools, including `media_desk_get_content_lab` and `media_desk_content_lab_action`. Editing the JSON alone does not upgrade the service. `media-desk tools` describes the local CLI catalog, so it is not sufficient evidence that the live Host supports the new tools. No per-tool configuration or additional model API key is needed for the existing workbench model connection.
+
 Default stdout is one compact JSON envelope. Diagnostics use stderr. Exit codes: `0` success, `1` operation/availability failure, `2` invalid command/input, `3` uncertain mutation outcome. Use `--input-file FILE` for long scripts. `--home DSH_HOME` overrides the default `$DSH_HOME` or `~/.dsh`. `--profile desktop` is the default; named profiles select a separate endpoint namespace and must match the Host server's profile option. The Host uses `DSH_PROFILE`, otherwise the basename of `DSH_PROFILE_DIR`, otherwise `desktop`; clients must select the same profile. Flags may appear before or after commands.
 
 ## Account scope

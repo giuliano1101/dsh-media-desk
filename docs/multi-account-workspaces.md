@@ -76,6 +76,38 @@
 
 自动化适配层与界面共用 Store、模型连接和生成器，提供 20 个精简工具；无需再开一个 Harness 服务。常规写稿/改稿调用工作台模型；`write-draft` 用于直接导入现成稿件。
 
+### 配置与升级核验
+
+本机 MCP 客户端可使用仓库提供的 [media-desk.mcp.json](media-desk.mcp.json)：
+
+```json
+{
+  "mcpServers": {
+    "media-desk": {
+      "type": "stdio",
+      "command": "media-desk",
+      "args": ["--profile", "desktop", "mcp"]
+    }
+  }
+}
+```
+
+若客户端无法从 PATH 找到命令，将 `command` 改为自己安装的 CLI 启动器绝对路径。自定义数据目录或其他 profile 还需传入匹配的 `--home`、`--profile`，连接正在运行的同一个工作台。桌面应用改名或移动后，自建启动器也要更新运行时路径，继续加载桌面已安装的插件。示例不包含个人目录、认证令牌或模型密钥。
+
+升级 Host 与 CLI 后，先运行 `media-desk doctor` 核对真实服务的 `pluginVersion`，再重连原来的 MCP 客户端，使其重新加载工具目录。`.5` 应提供 20 个工具，包含新增的 `media_desk_get_content_lab`、`media_desk_content_lab_action`。只改配置文件不会升级服务；`media-desk tools` 只描述本地 CLI 的目录，也不能单独证明服务已支持新接口。现有模型连接不需要为 CLI/MCP 另填 API Key，每个工具也不需要单独配置。
+
+新版本启用后可先进行只读核验：
+
+```sh
+media-desk doctor
+media-desk lab rubrics
+media-desk lab list --input '{"accountId":"ACCOUNT_ID","limit":20}'
+```
+
+评估、预测、锁定、发布登记和到期复盘的参数见[内容评估流程](automation.md#saved-version-review-prediction-and-timed-retrospective)。Grok Bot 通过本机执行调用相同 CLI；此 stdio 配置用于在工作台电脑上运行的 MCP 客户端。
+
+### 媒体导入与账号操作
+
 `media-desk import '/本机路径/图片.png' --input '{"accountId":"ACCOUNT_ID"}'` 或 MCP `media_desk_import_file` 将一个本机图片/视频加入该账号灵感，并继承平台；省略账号或传 null 则加入未归属。账号在文件读取前和串行保存时都会校验，期间被删除则清理此次副本并失败，不会悄悄转为未归属。MCP 路径必须是工作台电脑上的绝对路径，云端文件不会自动传输。JPEG/PNG/WebP/GIF 限 25,000,000 字节、4000 万像素、单边 16384；MP4/MOV/WebM 限 250,000,000 字节。复制保留原始字节与源文件，不转码、不调用模型。仅返回元数据、SHA-256 和媒体引用，可通过 `get_item.fields:["media"]` 查看。`--input-file` 仍只读取 JSON。相同 requestId 和参数最多复制一次；不确定结果通过请求状态与 `list_items.query` 搜索 `importRequestId` 核验，不能换新 ID 重试。详见[本机媒体导入](automation.md#local-image-and-video-import)。
 
 同一工具设置 `destination:"avatar"` 可直接导入指定账号头像，仅接受图片，必须提供具体 accountId，不接受 title/body/tags，不新建灵感，也不裁剪或压缩。`get_account`/`list_accounts` 仅在当前头像与导入记录相同时返回 `avatarImportRequestId`；之后手动替换或删除头像会隐藏旧标记，撤销可恢复对应引用，导入文件保留。结果不确定时核对该账号当前头像与请求标记。内部恢复标记不能通过 apply_ops 伪造。
